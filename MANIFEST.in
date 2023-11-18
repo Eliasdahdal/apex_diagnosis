@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include apex_diagnosis *.css
+recursive-include apex_diagnosis *.csv
+recursive-include apex_diagnosis *.html
+recursive-include apex_diagnosis *.ico
+recursive-include apex_diagnosis *.js
+recursive-include apex_diagnosis *.json
+recursive-include apex_diagnosis *.md
+recursive-include apex_diagnosis *.png
+recursive-include apex_diagnosis *.py
+recursive-include apex_diagnosis *.svg
+recursive-include apex_diagnosis *.txt
+recursive-exclude apex_diagnosis *.pyc
