@@ -1,0 +1,804 @@
+{% macro avatar(user_id=None, css_style=None, size="avatar-medium", full_name=None, image=None) %}
+{% set user_info = frappe.utils.get_user_info_for_avatar(user_id) %}
+<span class="avatar {{ size }}" title="{{ full_name or user_info.name }}" style="{{ css_style or '' }}">
+    {% if image or user_info.image %}
+    <img class="avatar-frame standard-image" src="{{ image or user_info.image }}"
+        title="{{ full_name or user_info.name }}">
+</span>
+{% else %}
+<span class="avatar-frame standard-image" title="{{ full_name or user_info.name }}">
+    {{ frappe.utils.get_abbr(full_name or user_info.name).upper() }}
+</span>
+{% endif %}
+</span>
+{% endmacro %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Apex Diagnosis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    {% block meta_block %}
+    {% include "templates/includes/meta_block.html" %}
+    {% endblock %}
+
+    <title>{% block title %}{{ title | striptags }}{% endblock %}</title>
+
+    {% block favicon %}
+    <link rel="shortcut icon" href="{{ (favicon or " /assets/frappe/images/frappe-favicon.svg") | abs_url }}"
+        type="image/x-icon">
+    {% endblock %}
+
+    <link rel="canonical" href="{{ canonical }}">
+
+    {%- block head -%}
+    {% if head_html is defined -%}
+    {{ head_html or "" }}
+    {%- endif %}
+
+    {%- if theme.name != 'Standard' -%}
+    <link type="text/css" rel="stylesheet" href="{{ theme.theme_url }}">
+    {%- else -%}
+    {{ include_style('website.bundle.css') }}
+    {%- endif -%}
+
+    {%- for link in web_include_css %}
+    {{ include_style(link) }}
+    {%- endfor -%}
+    {%- endblock -%}
+
+    {%- block head_include %}
+    {{ head_include or "" }}
+    {% endblock -%}
+
+    {%- block style %}
+    {% if colocated_css -%}
+    <style>
+        {
+                {
+                colocated_css
+            }
+        }
+    </style>
+    {%- endif %}
+    {%- endblock -%}
+
+    <script>
+        window.frappe = {};
+        frappe.ready_events = [];
+        frappe.ready = function (fn) {
+            frappe.ready_events.push(fn);
+        }
+        window.dev_server = {{ dev_server }};
+        window.socketio_port = {{ (frappe.socketio_port or 'null') }};
+        window.show_language_picker = {{ show_language_picker or 'false' }};
+    </script>
+
+    <script>
+        csrf_token = "{{ csrf_token }}";
+    </script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Css Styles -->
+    <link rel="stylesheet" href="/assets/apex_diagnosis/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="/assets/apex_diagnosis/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="/assets/apex_diagnosis/css/elegant-icons.css" type="text/css">
+    <link rel="stylesheet" href="/assets/apex_diagnosis/css/owl.carousel.min.css" type="text/css">
+    <link rel="stylesheet" href="/assets/apex_diagnosis/css/magnific-popup.css" type="text/css">
+    <link rel="stylesheet" href="/assets/apex_diagnosis/css/slicknav.min.css" type="text/css">
+    <link rel="stylesheet" href="/assets/apex_diagnosis/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/assets/apex_diagnosis/css/custom.css" type="text/css">
+
+ </head>
+
+<body>
+    {% include "public/icons/timeless/icons.svg" %}
+    {%- block banner -%}
+    {% include "templates/includes/banner_extension.html" ignore missing %}
+
+    {% if banner_html -%}
+    {{ banner_html or "" }}
+    {%- endif %}
+    {%- endblock -%}
+
+    {% block base_scripts %}
+    <!-- js should be loaded in body! -->
+    <script>
+        frappe.boot = {{ boot }}
+        // for backward compatibility of some libs
+        frappe.sys_defaults = frappe.boot.sysdefaults;
+    </script>
+    {{ include_script('frappe-web.bundle.js') }}
+    {% endblock %}
+
+    {%- for link in web_include_js %}
+    {{ include_script(link) }}
+    {%- endfor -%}
+
+    {%- block script %}
+    {% if colocated_js -%}
+    <script>{ { colocated_js } }</script>
+    {%- endif %}
+    {%- endblock %}
+    <!-- csrf_token -->
+    {%- block body_include %}{{ body_include or "" }}{% endblock -%}
+
+        <!-- Page Preloder -->
+        <div id="preloder">
+            <div class="loader"></div>
+        </div>
+    
+        <!-- Header Section Begin -->
+        <!-- <header class="header">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-2">
+                        <div class="header__logo">
+                            <a href="./index.html"><img src="/assets/apex_diagnosis/img/logo.png" alt=""></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-10">
+                        <div class="header__nav__option">
+                            <nav class="header__nav__menu mobile-menu">
+                                <ul>
+                                    <li class="active"><a href="./index.html">Home</a></li>
+                                    <li><a href="./about.html">About</a></li>
+                                    <li><a href="./portfolio.html">Portfolio</a></li>
+                                    <li><a href="./services.html">Services</a></li>
+                                    <li><a href="#">Pages</a>
+                                        <ul class="dropdown">
+                                            <li><a href="./about.html">About</a></li>
+                                            <li><a href="./portfolio.html">Portfolio</a></li>
+                                            <li><a href="./blog.html">Blog</a></li>
+                                            <li><a href="./blog-details.html">Blog Details</a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="./contact.html">Contact</a></li>
+                                </ul>
+                            </nav>
+                            <div class="header__nav__social">
+                                <a href="#"><i class="fa fa-facebook"></i></a>
+                                <a href="#"><i class="fa fa-twitter"></i></a>
+                                <a href="#"><i class="fa fa-dribbble"></i></a>
+                                <a href="#"><i class="fa fa-instagram"></i></a>
+                                <a href="#"><i class="fa fa-youtube-play"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="mobile-menu-wrap"></div>
+            </div>
+        </header> -->
+        <!-- Header End -->
+    
+    
+        <a class="info-toggle" href="#0">
+            <span class="info-menu-icon"></span>
+        </a>
+    
+        <div class=" s-info">
+    
+            <div class="row info-wrapper container">
+    
+    
+    
+                <div class="container  col-seven tab-full info-main">
+                    <h1>Apex Diagnosis.</h1>
+                    <p>
+                    Quisque velit nisi, pretium ut lacinia in, elementum id enim. Mauris blandit aliquet elit, 
+                    eget tincidunt nibh pulvinar a. Quisque velit nisi, pretium ut lacinia in, elementum id enim. 
+                    Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; 
+                    Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula.
+                    </p>
+    
+                    <p>
+                    Officiis nostrum adipisci minima. Enim tenetur animi ipsum a itaque temporibus necessitatibus. 
+                    Dolores ad perspiciatis. Voluptatem et molestiae adipisci laboriosam assumenda. Deleniti vero 
+                    labore eos repudiandae. Vel commodi tenetur ex quia. Quisque velit nisi, pretium ut lacinia in, 
+                    elementum id enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere.
+                    </p>
+                </div>
+    
+                <div class="container  col-four tab-full pull-right info-contact">
+    
+                    <div class="info-block">
+                        <h3>Start A Conversation</h3>
+                        <p>
+                            <a href="mailto:#0" class="info-email">mailus@ourwebsite.com</a><br>
+                            <a href="tel:+18587338912" class="'info-phone">+1.858.733.8912</a>
+                        </p>
+                    </div>
+    
+                    <div class="info-block">
+                        <h3>Visit Our Office</h3>
+                        
+                        <p class="info-address">
+                            1600 Amphitheatre Parkway<br>
+                            Mountain View, CA<br>
+                            94043 US
+                        </p>
+                    </div>
+    
+                    <div class="info-block">
+                        <h3>Find Us On</h3>
+                        
+                        <ul class="info-social">
+                            <li>
+                                <a href="#0"><i class="fab fa-facebook" aria-hidden="true"></i>
+                                <span>Facebook</span></a>
+                            </li>
+                            <li>
+                                <a href="#0"><i class="fab fa-twitter" aria-hidden="true"></i>
+                                <span>Twiiter</span></a>
+                            </li>
+                            <li>
+                                <a href="#0"><i class="fab fa-instagram" aria-hidden="true"></i>
+                                <span>Instagram</span></a>
+                            </li>
+                            <li>
+                                <a href="#0"><i class="fab fa-behance" aria-hidden="true"></i>
+                                <span>Behance</span></a>
+                            </li>
+                            <li>
+                                <a href="#0"><i class="fab fa-dribbble" aria-hidden="true"></i>
+                                <span>Dribbble</span></a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                </div>  <!-- end info contact -->
+    
+            </div>  <!-- end info wrapper -->
+    
+        </div> <!-- end s-info -->
+    
+        <div class="hero-section">
+            <div class="screen">
+                <div class="screen-image"></div>
+                <div class="screen-overlay"></div>
+                <div class="screen-content">
+                    <img class="detect-icon" src="/assets/apex_diagnosis/img/icons/detect_icon.svg">
+                    <div class="screen-user">
+                        <span class="name" data-value="Pneumonia Detection">Pneumonia Detection </span>
+                        <!-- <a class="link" href="#" target="_blank">@EliasDahdal</a> -->
+                        <a href="#" class="primary-btn">Detect NOW</a>
+                    </div>
+                </div>
+            </div>
+            <div id="blur"></div>
+        </div>
+    
+    
+    
+    
+        <!-- Services Section Begin -->
+        <section class="services spad">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="services__title">
+                            <div class="section-title">
+                                <span>Our services</span>
+                                <h2>What We do?</h2>
+                            </div>
+                            <p>If you hire a videographer of our team you will get a video professional to make a custom
+                                video for your business and, once the project is over.</p>
+                            <a href="#" class="primary-btn">View all services</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="services__item">
+                                    <div class="services__item__icon">
+                                        <img src="/assets/apex_diagnosis/img/icons/si-1.png" alt="">
+                                    </div>
+                                    <h4>Motion graphics</h4>
+                                    <p>Whether you’re halfway through the editing process, or you haven’t even started, our
+                                        post production services can put the finishing touches.</p>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="services__item">
+                                    <div class="services__item__icon">
+                                        <img src="/assets/apex_diagnosis/img/icons/si-2.png" alt="">
+                                    </div>
+                                    <h4>Scriptwriting and editing</h4>
+                                    <p>Whether you’re halfway through the editing process, or you haven’t even started, our
+                                        post production services can put the finishing touches.</p>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="services__item">
+                                    <div class="services__item__icon">
+                                        <img src="/assets/apex_diagnosis/img/icons/si-3.png" alt="">
+                                    </div>
+                                    <h4>Video distribution</h4>
+                                    <p>Whether you’re halfway through the editing process, or you haven’t even started, our
+                                        post production services can put the finishing touches.</p>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="services__item">
+                                    <div class="services__item__icon">
+                                        <img src="/assets/apex_diagnosis/img/icons/si-4.png" alt="">
+                                    </div>
+                                    <h4>Video hosting</h4>
+                                    <p>Whether you’re halfway through the editing process, or you haven’t even started, our
+                                        post production services can put the finishing touches.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Services Section End -->
+    
+        <!-- Work Section Begin -->
+        <section class="work">
+            <div class="work__gallery">
+                <div class="grid-sizer"></div>
+                <div class="work__item wide__item set-bg" data-setbg="/assets/apex_diagnosis/img/v1.jpeg">
+                    <div class="work__item__hover">
+                        <h4>VIP Auto Tires & Service</h4>
+                        <ul>
+                            <li>eCommerce</li>
+                            <li>Magento</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="work__item small__item set-bg" data-setbg="/assets/apex_diagnosis/img/v2.jpeg">
+                </div>
+                <div class="work__item small__item set-bg" data-setbg="/assets/apex_diagnosis/img/v3.jpeg">
+                </div>
+                <div class="work__item large__item set-bg" data-setbg="/assets/apex_diagnosis/img/v4.jpeg">
+    
+                    <div class="work__item__hover">
+                        <h4>VIP Auto Tires & Service</h4>
+                        <ul>
+                            <li>eCommerce</li>
+                            <li>Magento</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="work__item small__item set-bg" data-setbg="/assets/apex_diagnosis/img/work/work-5.jpg">
+                    <a href="https://www.youtube.com/watch?v=LXb3EKWsInQ" class="play-btn video-popup"><i
+                            class="fa fa-play"></i></a>
+                </div>
+                <div class="work__item small__item set-bg" data-setbg="/assets/apex_diagnosis/img/work/work-6.jpg">
+                    <a href="https://www.youtube.com/watch?v=LXb3EKWsInQ" class="play-btn video-popup"><i
+                            class="fa fa-play"></i></a>
+                </div>
+                <div class="work__item wide__item set-bg" data-setbg="/assets/apex_diagnosis/img/work/work-7.jpg">
+                    <a href="https://www.youtube.com/watch?v=LXb3EKWsInQ" class="play-btn video-popup"><i
+                            class="fa fa-play"></i></a>
+                    <div class="work__item__hover">
+                        <h4>VIP Auto Tires & Service</h4>
+                        <ul>
+                            <li>eCommerce</li>
+                            <li>Magento</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Work Section End -->
+    
+        <!-- Counter Section Begin -->
+        <section class="counter">
+            <div class="container">
+                <div class="counter__content">
+                    <div class="row">
+                        <div class="col-lg-3 col-md-6 col-sm-6">
+                            <div class="counter__item">
+                                <div class="counter__item__text">
+                                    <img src="/assets/apex_diagnosis/img/icons/ci-1.png" alt="">
+                                    <h2 class="counter_num">230</h2>
+                                    <p>Compled Projects</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-6">
+                            <div class="counter__item second__item">
+                                <div class="counter__item__text">
+                                    <img src="/assets/apex_diagnosis/img/icons/ci-2.png" alt="">
+                                    <h2 class="counter_num">1068</h2>
+                                    <p>Happy clients</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-6">
+                            <div class="counter__item third__item">
+                                <div class="counter__item__text">
+                                    <img src="/assets/apex_diagnosis/img/icons/ci-3.png" alt="">
+                                    <h2 class="counter_num">230</h2>
+                                    <p>Perspective clients</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-6">
+                            <div class="counter__item four__item">
+                                <div class="counter__item__text">
+                                    <img src="/assets/apex_diagnosis/img/icons/ci-4.png" alt="">
+                                    <h2 class="counter_num">230</h2>
+                                    <p>Compled Projects</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Counter Section End -->
+    
+        <!-- Team Section Begin -->
+        <section class="team spad set-bg" data-setbg="/assets/apex_diagnosis/img/team-bg.jpg">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="section-title team__title">
+                            <span>Nice to meet</span>
+                            <h2>OUR Team</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 col-sm-6 p-0">
+                        <div class="team__item set-bg" data-setbg="/assets/apex_diagnosis/img/team/team-1.jpg">
+                            <div class="team__item__text">
+                                <h4>AMANDA STONE</h4>
+                                <p>Videographer</p>
+                                <div class="team__item__social">
+                                    <a href="#"><i class="fa fa-facebook"></i></a>
+                                    <a href="#"><i class="fa fa-twitter"></i></a>
+                                    <a href="#"><i class="fa fa-dribbble"></i></a>
+                                    <a href="#"><i class="fa fa-instagram"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 col-sm-6 p-0">
+                        <div class="team__item team__item--second set-bg" data-setbg="/assets/apex_diagnosis/img/team/team-2.jpg">
+                            <div class="team__item__text">
+                                <h4>AMANDA STONE</h4>
+                                <p>Videographer</p>
+                                <div class="team__item__social">
+                                    <a href="#"><i class="fa fa-facebook"></i></a>
+                                    <a href="#"><i class="fa fa-twitter"></i></a>
+                                    <a href="#"><i class="fa fa-dribbble"></i></a>
+                                    <a href="#"><i class="fa fa-instagram"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 col-sm-6 p-0">
+                        <div class="team__item team__item--third set-bg" data-setbg="/assets/apex_diagnosis/img/team/team-3.jpg">
+                            <div class="team__item__text">
+                                <h4>AMANDA STONE</h4>
+                                <p>Videographer</p>
+                                <div class="team__item__social">
+                                    <a href="#"><i class="fa fa-facebook"></i></a>
+                                    <a href="#"><i class="fa fa-twitter"></i></a>
+                                    <a href="#"><i class="fa fa-dribbble"></i></a>
+                                    <a href="#"><i class="fa fa-instagram"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 col-sm-6 p-0">
+                        <div class="team__item team__item--four set-bg" data-setbg="/assets/apex_diagnosis/img/team/team-4.jpg">
+                            <div class="team__item__text">
+                                <h4>AMANDA STONE</h4>
+                                <p>Videographer</p>
+                                <div class="team__item__social">
+                                    <a href="#"><i class="fa fa-facebook"></i></a>
+                                    <a href="#"><i class="fa fa-twitter"></i></a>
+                                    <a href="#"><i class="fa fa-dribbble"></i></a>
+                                    <a href="#"><i class="fa fa-instagram"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 p-0">
+                        <div class="team__btn">
+                            <a href="#" class="primary-btn">Meet Our Team</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Team Section End -->
+    
+        <!-- Latest Blog Section Begin -->
+        <section class="latest spad">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="section-title center-title">
+                            <span>Our Blog</span>
+                            <h2>Blog Update</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="latest__slider owl-carousel">
+                        <div class="col-lg-4">
+                            <div class="blog__item latest__item">
+                                <h4>What Makes Users Want to Share a Video on Social Media?</h4>
+                                <ul>
+                                    <li>Jan 03, 2020</li>
+                                    <li>05 Comment</li>
+                                </ul>
+                                <p>We recently launched a new website for a Vital client and wanted to share some of the
+                                    cool features we were able...</p>
+                                <a href="#">Read more <span class="arrow_right"></span></a>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="blog__item latest__item">
+                                <h4>Bumper Ads: How to Tell a Story in 6 Seconds</h4>
+                                <ul>
+                                    <li>Jan 03, 2020</li>
+                                    <li>05 Comment</li>
+                                </ul>
+                                <p>We recently launched a new website for a Vital client and wanted to share some of the
+                                    cool features we were able...</p>
+                                <a href="#">Read more <span class="arrow_right"></span></a>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="blog__item latest__item">
+                                <h4>What Makes Users Want to Share a Video on Social Media?</h4>
+                                <ul>
+                                    <li>Jan 03, 2020</li>
+                                    <li>05 Comment</li>
+                                </ul>
+                                <p>We recently launched a new website for a Vital client and wanted to share some of the
+                                    cool features we were able...</p>
+                                <a href="#">Read more <span class="arrow_right"></span></a>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="blog__item latest__item">
+                                <h4>Bumper Ads: How to Tell a Story in 6 Seconds</h4>
+                                <ul>
+                                    <li>Jan 03, 2020</li>
+                                    <li>05 Comment</li>
+                                </ul>
+                                <p>We recently launched a new website for a Vital client and wanted to share some of the
+                                    cool features we were able...</p>
+                                <a href="#">Read more <span class="arrow_right"></span></a>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="blog__item latest__item">
+                                <h4>What Makes Users Want to Share a Video on Social Media?</h4>
+                                <ul>
+                                    <li>Jan 03, 2020</li>
+                                    <li>05 Comment</li>
+                                </ul>
+                                <p>We recently launched a new website for a Vital client and wanted to share some of the
+                                    cool features we were able...</p>
+                                <a href="#">Read more <span class="arrow_right"></span></a>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="blog__item latest__item">
+                                <h4>What Makes Users Want to Share a Video on Social Media?</h4>
+                                <ul>
+                                    <li>Jan 03, 2020</li>
+                                    <li>05 Comment</li>
+                                </ul>
+                                <p>We recently launched a new website for a Vital client and wanted to share some of the
+                                    cool features we were able...</p>
+                                <a href="#">Read more <span class="arrow_right"></span></a>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="blog__item latest__item">
+                                <h4>What Makes Users Want to Share a Video on Social Media?</h4>
+                                <ul>
+                                    <li>Jan 03, 2020</li>
+                                    <li>05 Comment</li>
+                                </ul>
+                                <p>We recently launched a new website for a Vital client and wanted to share some of the
+                                    cool features we were able...</p>
+                                <a href="#">Read more <span class="arrow_right"></span></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Latest Blog Section End -->
+    
+        <!-- Call To Action Section Begin -->
+        <section class="callto spad set-bg" data-setbg="/assets/apex_diagnosis/img/callto-bg.jpg">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="callto__text">
+                            <h2>Fresh Ideas, Fresh Moments Giving Wings to your Stories.</h2>
+                            <p>INC5000, Best places to work 2019</p>
+                            <a href="#">Start your stories</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Call To Action Section End -->
+    
+        <!-- Footer Section Begin -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer__top">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6">
+                            <div class="footer__top__logo">
+                                <a href="#"><img src="/assets/apex_diagnosis/img/logo.png" alt=""></a>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6">
+                            <div class="footer__top__social">
+                                <a href="#"><i class="fa fa-facebook"></i></a>
+                                <a href="#"><i class="fa fa-twitter"></i></a>
+                                <a href="#"><i class="fa fa-dribbble"></i></a>
+                                <a href="#"><i class="fa fa-instagram"></i></a>
+                                <a href="#"><i class="fa fa-youtube-play"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer__option">
+                    <div class="row">
+                        <div class="col-lg-4 col-md-6 col-sm-6">
+                            <div class="footer__option__item">
+                                <h5>About us</h5>
+                                <p>Formed in 2006 by Matt Hobbs and Cael Jones, Videoprah is an award-winning, full-service
+                                    production company specializing.</p>
+                                <a href="#" class="read__more">Read more <span class="arrow_right"></span></a>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-3">
+                            <div class="footer__option__item">
+                                <h5>Who we are</h5>
+                                <ul>
+                                    <li><a href="#">Team</a></li>
+                                    <li><a href="#">Carrers</a></li>
+                                    <li><a href="#">Contact us</a></li>
+                                    <li><a href="#">Locations</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-3">
+                            <div class="footer__option__item">
+                                <h5>Our work</h5>
+                                <ul>
+                                    <li><a href="#">Feature</a></li>
+                                    <li><a href="#">Latest</a></li>
+                                    <li><a href="#">Browse Archive</a></li>
+                                    <li><a href="#">Video for web</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-12">
+                            <div class="footer__option__item">
+                                <h5>Newsletter</h5>
+                                <p>Videoprah is an award-winning, full-service production company specializing.</p>
+                                <form action="#">
+                                    <input type="text" placeholder="Email">
+                                    <button type="submit"><i class="fa fa-send"></i></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer__copyright">
+                    <div class="row">
+                        <div class="col-lg-12 text-center">
+                            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                            <p class="footer__copyright__text">Copyright &copy;
+                                <script>
+                                    document.write(new Date().getFullYear());
+                                </script>
+                                All rights reserved | This template is made with <i class="fa fa-heart-o"
+                                    aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+                            </p>
+                            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- Footer Section End -->
+
+    <!-- Js Plugins -->
+    <script src="/assets/apex_diagnosis/js/jquery-3.3.1.min.js"></script>
+    <script src="/assets/apex_diagnosis/js/bootstrap.min.js"></script>
+    <script src="/assets/apex_diagnosis/js/jquery.magnific-popup.min.js"></script>
+    <script src="/assets/apex_diagnosis/js/mixitup.min.js"></script>
+    <script src="/assets/apex_diagnosis/js/masonry.pkgd.min.js"></script>
+    <script src="/assets/apex_diagnosis/js/jquery.slicknav.js"></script>
+    <script src="/assets/apex_diagnosis/js/owl.carousel.min.js"></script>
+    <script src="/assets/apex_diagnosis/js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+        crossorigin="anonymous"></script>
+    <script>
+
+        /* -- Text effect -- */
+
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+        let interval = null;
+
+        const screen = document.querySelector(".screen"),
+            name = document.querySelector(".name");
+
+        screen.onmouseenter = event => {
+            let iteration = 0;
+
+            clearInterval(interval);
+
+            interval = setInterval(() => {
+                name.innerText = name.innerText
+                    .split("")
+                    .map((letter, index) => {
+                        if (index < iteration) {
+                            return name.dataset.value[index];
+                        }
+
+                        return letters[Math.floor(Math.random() * 26)]
+                    })
+                    .join("");
+
+                if (iteration >= name.dataset.value.length) {
+                    clearInterval(interval);
+                }
+
+                iteration += 1 / 3;
+            }, 30);
+        }
+    </script>
+
+    <script>
+        /* info toggle
+ * ------------------------------------------------------ */
+        var ssInfoToggle = function () {
+
+            //open/close lateral navigation
+            $('.info-toggle').on('click', function (event) {
+
+                event.preventDefault();
+                $('body').toggleClass('info-is-visible');
+
+            });
+
+        };
+
+        /* initialize
+     * ------------------------------------------------------ */
+        (function ssInit() {
+            ssInfoToggle();
+        })();
+
+    </script>
+
+</body>
+
+</html>
