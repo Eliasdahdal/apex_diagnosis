@@ -1,1 +1,6 @@
 # frappe -- https://github.com/frappe/frappe is installed via 'bench init'
+numpy==1.22.0
+tensorflow==2.11.0
+tensorflow-estimator==2.11.0
+keras==2.11.0
+Pillow==9.5.0

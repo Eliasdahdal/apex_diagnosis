@@ -139,50 +139,7 @@
             <div class="loader"></div>
         </div>
     
-        <!-- Header Section Begin -->
-        <!-- <header class="header">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-2">
-                        <div class="header__logo">
-                            <a href="./index.html"><img src="/assets/apex_diagnosis/img/logo.png" alt=""></a>
-                        </div>
-                    </div>
-                    <div class="col-lg-10">
-                        <div class="header__nav__option">
-                            <nav class="header__nav__menu mobile-menu">
-                                <ul>
-                                    <li class="active"><a href="./index.html">Home</a></li>
-                                    <li><a href="./about.html">About</a></li>
-                                    <li><a href="./portfolio.html">Portfolio</a></li>
-                                    <li><a href="./services.html">Services</a></li>
-                                    <li><a href="#">Pages</a>
-                                        <ul class="dropdown">
-                                            <li><a href="./about.html">About</a></li>
-                                            <li><a href="./portfolio.html">Portfolio</a></li>
-                                            <li><a href="./blog.html">Blog</a></li>
-                                            <li><a href="./blog-details.html">Blog Details</a></li>
-                                        </ul>
-                                    </li>
-                                    <li><a href="./contact.html">Contact</a></li>
-                                </ul>
-                            </nav>
-                            <div class="header__nav__social">
-                                <a href="#"><i class="fa fa-facebook"></i></a>
-                                <a href="#"><i class="fa fa-twitter"></i></a>
-                                <a href="#"><i class="fa fa-dribbble"></i></a>
-                                <a href="#"><i class="fa fa-instagram"></i></a>
-                                <a href="#"><i class="fa fa-youtube-play"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="mobile-menu-wrap"></div>
-            </div>
-        </header> -->
-        <!-- Header End -->
-    
-    
+
         <a class="info-toggle" href="#0">
             <span class="info-menu-icon"></span>
         </a>
@@ -273,13 +230,27 @@
                         <span class="name" data-value="Pneumonia Detection">Pneumonia Detection </span>
                         <!-- <a class="link" href="#" target="_blank">@EliasDahdal</a> -->
                         <a href="#" class="primary-btn">Detect NOW</a>
+                        <a> {{patient}}</a>
                     </div>
                 </div>
             </div>
             <div id="blur"></div>
         </div>
     
-    
+        <form class="" id="contact-form" method="post" enctype="multipart/form-data">
+            <input type="file" name="files[]" multiple>
+            <input type="submit" id="submit" value="Upload and Predict">
+        </form>
+
+        
+        <div class="deteaction-result">
+
+        </div>
+
+
+    <div id="messages-container">
+        <!-- Messages will be displayed here -->
+    </div>
     
     
         <!-- Services Section Begin -->
@@ -798,6 +769,100 @@
         })();
 
     </script>
+
+    <script>
+        csrf_token = "{{ csrf_token }}";
+    </script>
+
+
+
+    
+    <script>
+        
+        var predict_image = function (formData, csrf) {
+            return new Promise(function (resolve, reject) {
+                var settings = {
+                    "url": "/api/method/apex_diagnosis.www.Pages.base.index",
+                    "method": "POST",
+                    "timeout": 0,
+                    "data": formData,
+                    "contentType": false,
+                    "processData": false,
+                    "beforeSend": function (xhr) {
+                        xhr.setRequestHeader('X-Frappe-CSRF-Token', csrf);
+                    }
+                };
+    
+                $.ajax(settings).done(function (response) {
+                    resolve({
+                        success: true,
+                        response: response
+                    });
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    reject({
+                        success: false,
+                        message: jqXHR.responseText
+                    });
+                });
+            });
+        }
+
+        // Function to create and append elements to the body
+        function createImageElement(message) {
+            var container = document.createElement('div');
+            container.className = 'image-container';
+
+            var image = document.createElement('img');
+            var imagePath = message.image_path.replace(/.*\/public\//, '/assets/apex_diagnosis/');
+            console.log(imagePath)
+            image.src = imagePath;
+            image.alt = 'Uploaded Image';
+            
+            var percentages = document.createElement('div');
+            percentages.className = 'class-percentages';
+            percentages.textContent = `NORMAL: ${message.class_percentage.NORMAL.toFixed(2)}%, PNEUMONIA: ${message.class_percentage.PNEUMONIA.toFixed(2)}%`;
+
+            container.appendChild(image);
+            container.appendChild(document.createElement('br'));
+            container.appendChild(document.createTextNode(message.message));
+            container.appendChild(percentages);
+
+            document.body.appendChild(container);
+        }
+
+
+        document.getElementById("submit").addEventListener("click", function (event) {
+            event.preventDefault();
+    
+            var formData = new FormData(document.getElementById("contact-form"));
+    
+            console.log(csrf_token)
+            predict_image(formData, csrf_token)
+                .then(function (result) {
+                    if (result.success) {
+                        var detactionResult = result.response.message;
+                        detactionResult.forEach(function(message) {
+                            createImageElement(message);
+                        });
+
+                        console.log(detactionResult)
+                    } else {
+                        // Show error message
+                        alert(result.message);
+                    }
+                })
+                .catch(function (error) {
+                    // Show error message
+                    alert(error.message);
+                });
+        });
+
+    </script>
+    
+    
+
+
+
 
 </body>
 
