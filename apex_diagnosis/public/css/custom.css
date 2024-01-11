@@ -617,6 +617,21 @@
     -webkit-transition: transform 0.5s cubic-bezier(0.82, 0.01, 0.77, 0.78);
     transition: transform 0.5s cubic-bezier(0.82, 0.01, 0.77, 0.78);
   }
+
+  .chest-image {
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
+  }
+
+  .detection-result {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+  }
+
+  .detection-result .image-container {
+  }
   
   /* ------------------------------------------------------------------- 
    * responsive:
