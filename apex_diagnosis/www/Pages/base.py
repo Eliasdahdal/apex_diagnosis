@@ -8,17 +8,28 @@ from keras.models import load_model
 from keras.models import model_from_json
 from PIL import Image
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+model_json_name = "/model1.json"
+model_h5_name = "/model1.h5"
+
+model_json_path = current_dir + model_json_name
+model_h5_path = current_dir + model_h5_name
+
+# print(os.path.abspath(os.path.join(current_dir, '..')) + "5555555555555555555555555555555555555555555555555555")
+
+
 @frappe.whitelist(allow_guest=True)
 # Load the model and preprocessing functions
 def load_my_model():
     # Load the model architecture from JSON
-    json_file = open('/home/elias/Apex-Diagnosis/apps/apex_diagnosis/model1.json', 'r')
+
+    json_file = open(model_json_path, 'r')
     loaded_model_json = json_file.read()
     json_file.close()
     loaded_model = model_from_json(loaded_model_json)
 
     # Load the model weights
-    loaded_model.load_weights('/home/elias/Apex-Diagnosis/apps/apex_diagnosis/model1.h5')
+    loaded_model.load_weights(model_h5_path)
 
     # Compile the model
     loaded_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
@@ -66,8 +77,11 @@ def index():
     messages = []
     class_percentages_list = []
     image_paths = []
-
+    first_name = frappe.request.form.get("first_name")
+    last_name = frappe.request.form.get("last_name")
+    governorate = frappe.request.form.get("governorate")
     files = frappe.request.files.getlist("files[]")
+
 
     for file in files:
         if file.filename == "":
@@ -102,14 +116,23 @@ def index():
             "image_path": file_path
         })
         
+        image_path = file_path.replace('/home/elias/Apex-Diagnosis/apps/apex_diagnosis/apex_diagnosis/public/', '/assets/apex_diagnosis/')
+        todo = frappe.get_doc({"doctype":"X-Ray",
+                               "first_name": first_name,
+                               "last_name": last_name,
+                               "governorate_name":governorate,
+                               "chest_image":image_path,})
+        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+        print(governorate)
+        todo.insert(ignore_permissions = True)
+        
         print(messages)
 
     return messages
 
 def get_context(context):
 
-    # context.patient = frappe.db.get_all('Patient')
-    # print(context.patient)
+
     context.csrf_token = frappe.sessions.get_csrf_token()
     frappe.db.commit()
     

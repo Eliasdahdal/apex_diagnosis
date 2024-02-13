@@ -57,7 +57,6 @@ document.getElementById("submit").addEventListener("click", function (event) {
 
     var formData = new FormData(document.getElementById("image-upload-form"));
 
-    console.log(csrf_token)
     predict_image(formData, csrf_token)
         .then(function (result) {
             if (result.success) {
