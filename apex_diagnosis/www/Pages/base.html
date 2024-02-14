@@ -151,10 +151,16 @@
     
     
                 <div class="container  col-seven tab-full info-main">
+                    <a href="http://127.0.0.1:8002/">Home</a>
+                    <br>
                     {% if (frappe.session.user == "Guest") %}
                     <a href="http://127.0.0.1:8002/app">Login</a>
                     {% else %}
                     <a href="http://127.0.0.1:8002/me">your dashboard</a>
+                    {% endif %}
+                    <br>
+                    {% if (frappe.session.user == "Administrator") %}
+                    <a href="http://127.0.0.1:8002/Pages/statistics">Statistics</a>
                     {% endif %}
                     <h1>Apex Diagnosis.</h1>
                     <p>
@@ -366,6 +372,95 @@
             }, 30);
         }
     </script>
+    <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js">
+    </script>
+
+{% if frappe.session.user == "Administrator" %}
+<script>
+    var isAdmin = true;
+</script>
+{% else %}
+<script>
+    var isAdmin = false;
+</script>
+{% endif %}
+<script id="apex_patient_data" type="application/json">{{ apex_patient }}</script>
+
+<script>
+    const value = document.getElementById('apex_patient_data').textContent;
+
+    // Replace single quotes with double quotes
+    const correctedValue = value.replace(/'/g, '"');
+
+    // Replace 'None' with null
+    const correctedJSON = correctedValue.replace(/None/g, 'null');
+
+    // Parse the corrected JSON string into a JavaScript object
+    const data = JSON.parse(correctedJSON);
+    
+    var locations = []
+    // Iterate over the array of objects
+    data.forEach(item => {
+        // Check if latitude and longitude are not null
+        if (item.latitude !== null && item.longitude !== null) {
+            // Push latitude and longitude to the locations array
+            locations.push({ lat: parseFloat(item.latitude), lng: parseFloat(item.longitude) });
+        }
+    });
+    
+    console.log(locations); // Check the updated locations array
+    
+    function initUserMap() {
+        var defaultLocation = { lat: 34.97642113595646, lng: 38.10153104117244 };
+
+        var map = new google.maps.Map(document.getElementById('userMap'), {
+            zoom:7,
+            center: defaultLocation
+        });
+
+        map.addListener('click', function (event) {
+            placeMarker(event.latLng, map);
+        });
+
+        function placeMarker(location, map) {
+            if (window.marker) {
+                window.marker.setMap(null);
+            }
+
+            window.marker = new google.maps.Marker({
+                position: location,
+                map: map
+            });
+
+            document.getElementById('latitude').value = location.lat();
+            document.getElementById('longitude').value = location.lng();
+
+            var latLngString = "{lat: " + location.lat() + ", lng: " + location.lng() + "}";
+            alert("Selected location: " + latLngString);
+        }
+
+        // Create an array of alphabetical characters used to label the markers.
+        var labels = isAdmin ? ["T", "T", "C", "C", "O"] : [];
+
+        // Add some markers to the map if isAdmin is true.
+        if (isAdmin) {
+            var markers = locations.map(function (location, i) {
+                return new google.maps.Marker({
+                    position: location,
+                    label: labels[i]
+                });
+            });
+
+            // Add a marker clusterer to manage the markers.
+            var markerCluster = new MarkerClusterer(map, markers,
+                { imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m' });
+        }
+    }
+</script>
+
+<script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD_MZOIiRzV4D0y4652wPHkot3Dqq2KrH0&callback=initUserMap">
+</script>
 
     <script>
         /* info toggle

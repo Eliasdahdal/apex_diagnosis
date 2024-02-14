@@ -1,0 +1,92 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-02-13 14:16:42.335216",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "first_name",
+  "last_name",
+  "latitude",
+  "longitude",
+  "governorate_name",
+  "chest_image",
+  "chest_cover",
+  "result"
+ ],
+ "fields": [
+  {
+   "fieldname": "first_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "first name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "last_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "last name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "latitude",
+   "fieldtype": "Data",
+   "label": "latitude"
+  },
+  {
+   "fieldname": "longitude",
+   "fieldtype": "Data",
+   "label": "longitude"
+  },
+  {
+   "fieldname": "governorate_name",
+   "fieldtype": "Link",
+   "label": "governorate name",
+   "options": "syria governorates"
+  },
+  {
+   "fieldname": "chest_image",
+   "fieldtype": "Attach Image",
+   "label": "chest image",
+   "reqd": 1
+  },
+  {
+   "fieldname": "chest_cover",
+   "fieldtype": "Image",
+   "label": "chest cover",
+   "options": "chest_image"
+  },
+  {
+   "fieldname": "result",
+   "fieldtype": "Text",
+   "label": "result"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-02-13 14:16:42.335216",
+ "modified_by": "Administrator",
+ "module": "Apex Diagnosis",
+ "name": "apex patient",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

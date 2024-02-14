@@ -80,6 +80,8 @@ def index():
     first_name = frappe.request.form.get("first_name")
     last_name = frappe.request.form.get("last_name")
     governorate = frappe.request.form.get("governorate")
+    latitude  = frappe.request.form.get("latitude")
+    longitude = frappe.request.form.get("longitude")
     files = frappe.request.files.getlist("files[]")
 
 
@@ -115,15 +117,15 @@ def index():
             "class_percentage": class_percentages,
             "image_path": file_path
         })
-        
+
         image_path = file_path.replace('/home/elias/Apex-Diagnosis/apps/apex_diagnosis/apex_diagnosis/public/', '/assets/apex_diagnosis/')
-        todo = frappe.get_doc({"doctype":"X-Ray",
+        todo = frappe.get_doc({"doctype":"apex patient",
                                "first_name": first_name,
                                "last_name": last_name,
                                "governorate_name":governorate,
+                               "latitude":latitude,
+                               "longitude":longitude,
                                "chest_image":image_path,})
-        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-        print(governorate)
         todo.insert(ignore_permissions = True)
         
         print(messages)
@@ -132,7 +134,8 @@ def index():
 
 def get_context(context):
 
-
+    
+    context.apex_patient = frappe.db.get_all('apex patient',fields=["latitude","longitude"])
     context.csrf_token = frappe.sessions.get_csrf_token()
     frappe.db.commit()
     
