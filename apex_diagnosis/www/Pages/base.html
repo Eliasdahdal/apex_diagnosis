@@ -100,6 +100,13 @@
     <link rel="stylesheet" href="/assets/apex_diagnosis/css/style.css" type="text/css">
     <link rel="stylesheet" href="/assets/apex_diagnosis/css/custom.css" type="text/css">
 
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ==" crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.3.0/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.3.0/dist/MarkerCluster.Default.css" />
+  
+
+
  </head>
 
 <body>
@@ -375,41 +382,10 @@
     <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js">
     </script>
 
-{% if frappe.session.user == "Administrator" %}
-<script>
-    var isAdmin = true;
-</script>
-{% else %}
-<script>
-    var isAdmin = false;
-</script>
-{% endif %}
-<script id="apex_patient_data" type="application/json">{{ apex_patient }}</script>
+    
 
 <script>
-    const value = document.getElementById('apex_patient_data').textContent;
 
-    // Replace single quotes with double quotes
-    const correctedValue = value.replace(/'/g, '"');
-
-    // Replace 'None' with null
-    const correctedJSON = correctedValue.replace(/None/g, 'null');
-
-    // Parse the corrected JSON string into a JavaScript object
-    const data = JSON.parse(correctedJSON);
-    
-    var locations = []
-    // Iterate over the array of objects
-    data.forEach(item => {
-        // Check if latitude and longitude are not null
-        if (item.latitude !== null && item.longitude !== null) {
-            // Push latitude and longitude to the locations array
-            locations.push({ lat: parseFloat(item.latitude), lng: parseFloat(item.longitude) });
-        }
-    });
-    
-    console.log(locations); // Check the updated locations array
-    
     function initUserMap() {
         var defaultLocation = { lat: 34.97642113595646, lng: 38.10153104117244 };
 
@@ -438,23 +414,6 @@
             var latLngString = "{lat: " + location.lat() + ", lng: " + location.lng() + "}";
             alert("Selected location: " + latLngString);
         }
-
-        // Create an array of alphabetical characters used to label the markers.
-        var labels = isAdmin ? ["T", "T", "C", "C", "O"] : [];
-
-        // Add some markers to the map if isAdmin is true.
-        if (isAdmin) {
-            var markers = locations.map(function (location, i) {
-                return new google.maps.Marker({
-                    position: location,
-                    label: labels[i]
-                });
-            });
-
-            // Add a marker clusterer to manage the markers.
-            var markerCluster = new MarkerClusterer(map, markers,
-                { imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m' });
-        }
     }
 </script>
 
@@ -482,6 +441,7 @@
         (function ssInit() {
             ssInfoToggle();
         })();
+
 
     </script>
 

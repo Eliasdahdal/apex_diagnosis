@@ -11,6 +11,8 @@
   "last_name",
   "latitude",
   "longitude",
+  "normal_percentage",
+  "pneumonia_percentage",
   "governorate_name",
   "chest_image",
   "chest_cover",
@@ -63,11 +65,21 @@
    "fieldname": "result",
    "fieldtype": "Text",
    "label": "result"
+  },
+  {
+   "fieldname": "normal_percentage",
+   "fieldtype": "Data",
+   "label": "normal percentage"
+  },
+  {
+   "fieldname": "pneumonia_percentage",
+   "fieldtype": "Data",
+   "label": "pneumonia percentage"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-02-13 14:16:42.335216",
+ "modified": "2024-02-16 10:23:30.020714",
  "modified_by": "Administrator",
  "module": "Apex Diagnosis",
  "name": "apex patient",

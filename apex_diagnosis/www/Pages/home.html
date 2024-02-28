@@ -23,43 +23,48 @@
 {% if (frappe.session.user == "Guest" ) %}
 
 {% else %} 
-<div class="container main-form-container">
-    <form class="main-form" id="image-upload-form" method="post" enctype="multipart/form-data">
 
-        <div class="form-group">
-            <label for="first_name" class="form-label ">First Name <span
-                    style="color:#D93F48;">*</span></label>
-            <input type="text" class="form-control " id="first_name" name="first_name">
-            <span class="error-message" id="first_name-error"></span>
-        </div>
-
-        <div class="form-group">
-            <label for="last_name" class="form-label ">Last Name <span
-                    style="color:#D93F48;">*</span></label>
-            <input type="text" class="form-control " id="last_name" name="last_name">
-            <span class="error-message" id="last_name-error"></span>
-        </div>
-
-        <div class="form-group">
-            <select class="form-select" name="governorate" aria-label="Default select example">
-                <option>Choose your governorate</option>
-                {% for governorate in governorates %}
-                    <option value="{{governorate.name}}">{{governorate.name}}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <input type="hidden" id="latitude" name="latitude">
-        <input type="hidden" id="longitude" name="longitude">
-
-        <h2>Choose your home location</h2>
-        <div style="height: 400px;width: 100%;" id="userMap"></div>
-
-        <input type="file" name="files[]" multiple>
-        <input type="submit" id="submit" value="Upload and Predict">
-    </form>
+<div class="main-form">
+    <div class="container main-form-container">
+        <form class="main-form" id="image-upload-form" method="post" enctype="multipart/form-data">
+    
+            <div class="form-group">
+                <label for="first_name" class="form-label ">First Name <span
+                        style="color:#D93F48;">*</span></label>
+                <input type="text" class="form-control " id="first_name" name="first_name">
+                <span class="error-message" id="first_name-error"></span>
+            </div>
+    
+            <div class="form-group">
+                <label for="last_name" class="form-label ">Last Name <span
+                        style="color:#D93F48;">*</span></label>
+                <input type="text" class="form-control " id="last_name" name="last_name">
+                <span class="error-message" id="last_name-error"></span>
+            </div>
+    
+            <div class="form-group">
+                <select class="form-select" name="governorate" aria-label="Default select example">
+                    <option>Choose your governorate</option>
+                    {% for governorate in governorates %}
+                        <option value="{{governorate.name}}">{{governorate.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+    
+            <input type="hidden" id="latitude" name="latitude">
+            <input type="hidden" id="longitude" name="longitude">
+    
+            <h2>Choose your home location</h2>
+            <div style="height: 400px;width: 100%;" id="userMap"></div>
+    
+            <input type="file" name="files[]" multiple>
+            <input type="submit" id="submit" value="Upload and Predict" onclick="validateForm()">
+        </form>
+    </div>
+    <div class="container detection-result"></div>
 </div>
-<div class="container detection-result"></div>
+
+
 {% endif %}
 
 
@@ -429,6 +434,7 @@
     </div>
 </section>
 <!-- Call To Action Section End -->
+
 
 
 {% endblock %}

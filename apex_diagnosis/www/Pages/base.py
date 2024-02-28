@@ -117,16 +117,38 @@ def index():
             "class_percentage": class_percentages,
             "image_path": file_path
         })
+        
+    todos = []
 
-        image_path = file_path.replace('/home/elias/Apex-Diagnosis/apps/apex_diagnosis/apex_diagnosis/public/', '/assets/apex_diagnosis/')
-        todo = frappe.get_doc({"doctype":"apex patient",
-                               "first_name": first_name,
-                               "last_name": last_name,
-                               "governorate_name":governorate,
-                               "latitude":latitude,
-                               "longitude":longitude,
-                               "chest_image":image_path,})
-        todo.insert(ignore_permissions = True)
+    for message in messages:
+        normal_percentage = message['class_percentage']['NORMAL']  
+        pneumonia_percentage = message['class_percentage']['PNEUMONIA']
+        
+        # Adjusting the image path
+        image_path = message['image_path'].replace('/home/elias/Apex-Diagnosis/apps/apex_diagnosis/apex_diagnosis/public/', '/assets/apex_diagnosis/')
+
+        # Storing relevant information in a dictionary
+        todo_info = {
+            "first_name": first_name,
+            "last_name": last_name,
+            "governorate_name": governorate,
+            "latitude": latitude,
+            "longitude": longitude,
+            "normal_percentage": normal_percentage,
+            "pneumonia_percentage": pneumonia_percentage,
+            "chest_image": image_path,
+        }
+
+        # Appending the dictionary to the list
+        todos.append(todo_info)
+
+    # Inserting todos outside the loop
+    for todo_info in todos:
+        todo = frappe.get_doc({
+            "doctype": "apex patient",
+            **todo_info  # Unpacking the todo_info dictionary
+        })
+        todo.insert(ignore_permissions=True)
         
         print(messages)
 
