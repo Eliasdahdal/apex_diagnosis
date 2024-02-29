@@ -52,28 +52,109 @@ function createImageElement(message, parentElement) {
 }
 
 
+    //for validation
+    // Get the form and its input fields
+    var form = document.querySelector('.main-form');
+    var inputs = form.querySelectorAll('input[type=text]');
+
+    // Reset the form and clear the input fields
+    function resetForm() {
+    form.reset();
+    inputs.forEach(function(input) {
+        input.value = '';
+    });
+    }
+
+    // Function to validate the form
+    function validateForm() {
+
+        var first_name = document.getElementById("first_name").value;
+        var last_name = document.getElementById("last_name").value;
+        var governorate = document.querySelector('select[name="governorate"]').value;
+        var files = document.getElementById('uploadFile').files;
+        var isValid = true;
+
+        // Check first name is not empty
+        if (first_name === "") {
+            document.getElementById("first_name-error").innerHTML = "Please enter your first name";
+            isValid = false;
+        } else {
+            document.getElementById("first_name-error").innerHTML = "";
+        }
+
+        // Check last name is not empty
+        if (last_name === "") {
+            document.getElementById("last_name-error").innerHTML = "Please enter your last name";
+            isValid = false;
+        } else {
+            document.getElementById("last_name-error").innerHTML = "";
+        }
+
+        // Check governorate name is not empty
+        if (governorate === "Choose your governorate") {
+            document.getElementById("governorate-error").innerHTML = "Please choose your governorate ";
+            isValid = false;
+        }else {
+            document.getElementById("governorate-error").innerHTML = "";
+        }
+
+        // Validate file upload
+        if (files.length === 0) {
+            document.getElementById("image-upload-error").innerHTML = "Please select at least one file";
+            isValid = false;
+        }else {
+            document.getElementById("image-upload-error").innerHTML = "";
+        }
+
+        return isValid;
+    }
+
 document.getElementById("submit").addEventListener("click", function (event) {
     event.preventDefault();
+    if (validateForm()) {
+        var formData = new FormData(document.getElementById("image-upload-form"));
 
-    var formData = new FormData(document.getElementById("image-upload-form"));
-
-    predict_image(formData, csrf_token)
-        .then(function (result) {
-            if (result.success) {
-                var detectionResult = result.response.message;
-                detectionResult.forEach(function(message) {
-                    createImageElement(message, detectionResultDiv);
-                });
-            } else {
+        predict_image(formData, csrf_token)
+            .then(function (result) {
+                if (result.success) {
+                    var detectionResult = result.response.message;
+                    detectionResult.forEach(function(message) {
+                        createImageElement(message, detectionResultDiv);
+                    });
+                } else {
+                    // Show error message
+                    alert(result.message);
+                }
+            })
+            .catch(function (error) {
                 // Show error message
-                alert(result.message);
-            }
-        })
-        .catch(function (error) {
-            // Show error message
-            alert(error.message);
-        });
+                alert(error.message);
+            });
+    }
 });
 
+
+// Drop and Drag Area
+
+"use strict";
+function dragNdrop(event) {
+    var files = event.target.files;
+    var preview = document.getElementById("preview");
+    preview.innerHTML = ""; // Clear previous previews
+
+    for (var i = 0; i < files.length; i++) {
+        var fileName = URL.createObjectURL(files[i]);
+        var previewImg = document.createElement("img");
+        previewImg.setAttribute("src", fileName);
+        preview.appendChild(previewImg);
+    }
+}
+
+function drag() {
+    document.getElementById('uploadFile').parentNode.className = 'draging dragBox';
+}
+function drop() {
+    document.getElementById('uploadFile').parentNode.className = 'dragBox';
+}
 
 
