@@ -109,29 +109,37 @@ function createImageElement(message, parentElement) {
         return isValid;
     }
 
-document.getElementById("submit").addEventListener("click", function (event) {
-    event.preventDefault();
-    if (validateForm()) {
-        var formData = new FormData(document.getElementById("image-upload-form"));
-
-        predict_image(formData, csrf_token)
-            .then(function (result) {
-                if (result.success) {
-                    var detectionResult = result.response.message;
-                    detectionResult.forEach(function(message) {
-                        createImageElement(message, detectionResultDiv);
-                    });
-                } else {
+    document.getElementById("submit").addEventListener("click", function (event) {
+        event.preventDefault();
+        if (validateForm()) {
+            var formData = new FormData(document.getElementById("image-upload-form"));
+            
+            // Show loading overlay
+            document.querySelector('.loading-overlay').style.display = 'block';
+    
+            predict_image(formData, csrf_token)
+                .then(function (result) {
+                    if (result.success) {
+                        var detectionResult = result.response.message;
+                        detectionResult.forEach(function(message) {
+                            createImageElement(message, detectionResultDiv);
+                        });
+                    } else {
+                        // Show error message
+                        alert(result.message);
+                    }
+                })
+                .catch(function (error) {
                     // Show error message
-                    alert(result.message);
-                }
-            })
-            .catch(function (error) {
-                // Show error message
-                alert(error.message);
-            });
-    }
-});
+                    alert(error.message);
+                })
+                .finally(function () {
+                    // Hide loading overlay regardless of success or failure
+                    document.querySelector('.loading-overlay').style.display = 'none';
+                });
+        }
+    });
+    
 
 
 // Drop and Drag Area
