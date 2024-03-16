@@ -38,18 +38,48 @@ function createImageElement(message, parentElement) {
     var imagePath = message.image_path.replace(/.*\/public\//, '/assets/apex_diagnosis/');
     image.src = imagePath;
     image.alt = 'Uploaded Image';
-    
+
     var percentages = document.createElement('div');
     percentages.className = 'class-percentages';
     percentages.textContent = `NORMAL: ${message.class_percentage.NORMAL.toFixed(2)}%, PNEUMONIA: ${message.class_percentage.PNEUMONIA.toFixed(2)}%`;
 
+    var diagnosis = document.createElement('div');
+    diagnosis.className = 'diagnosis';
+    diagnosis.textContent = message.diagnosis;
+
+    var normalProgressBar = document.createElement('progress');
+    normalProgressBar.value = message.class_percentage.NORMAL.toFixed(2);
+    normalProgressBar.max = 100;
+    normalProgressBar.className = 'normal-progress-bar';
+
+    var pneumoniaProgressBar = document.createElement('progress');
+    pneumoniaProgressBar.value = message.class_percentage.PNEUMONIA.toFixed(2);
+    pneumoniaProgressBar.max = 100;
+    pneumoniaProgressBar.className = 'pneumonia-progress-bar';
+
     container.appendChild(image);
     container.appendChild(document.createElement('br'));
     container.appendChild(percentages);
+    container.appendChild(normalProgressBar);
+    container.appendChild(pneumoniaProgressBar);
+    container.appendChild(document.createElement('br')); // Add line break before diagnosis
+    container.appendChild(diagnosis); // Append the diagnosis text below the image
 
     // Append the image-container to the specified parentElement
     parentElement.appendChild(container);
+    
+    // Dynamically set progress bar colors based on the condition
+    if (message.class_percentage.NORMAL > message.class_percentage.PNEUMONIA) {
+        normalProgressBar.classList.add('green-progress');
+        pneumoniaProgressBar.classList.add('blue-progress');
+    } else {
+        normalProgressBar.classList.add('blue-progress');
+        pneumoniaProgressBar.classList.add('red-progress');
+    }
 }
+
+
+
 
 
     //for validation
@@ -70,6 +100,7 @@ function createImageElement(message, parentElement) {
 
         var first_name = document.getElementById("first_name").value;
         var last_name = document.getElementById("last_name").value;
+        var symptoms = document.getElementById("symptoms").value;
         var governorate = document.querySelector('select[name="governorate"]').value;
         var files = document.getElementById('uploadFile').files;
         var isValid = true;
@@ -88,6 +119,13 @@ function createImageElement(message, parentElement) {
             isValid = false;
         } else {
             document.getElementById("last_name-error").innerHTML = "";
+        }
+
+        if (symptoms === "") {
+            document.getElementById("symptoms-error").innerHTML = "Please enter your symptoms";
+            isValid = false;
+        } else {
+            document.getElementById("symptoms-error").innerHTML = "";
         }
 
         // Check governorate name is not empty
@@ -120,6 +158,7 @@ function createImageElement(message, parentElement) {
             predict_image(formData, csrf_token)
                 .then(function (result) {
                     if (result.success) {
+                        console.log(result)
                         var detectionResult = result.response.message;
                         detectionResult.forEach(function(message) {
                             createImageElement(message, detectionResultDiv);

@@ -55,9 +55,15 @@
     
             <input type="hidden" id="latitude" name="latitude">
             <input type="hidden" id="longitude" name="longitude">
-    
             <h2>Choose your home location</h2>
             <div style="height: 400px;width: 100%;  border-radius: 8px;" id="userMap"></div>
+
+            <div class="form-group">
+                <label for="symptoms" class="form-label ">Explain your symptoms so that you can be diagnosed <span
+                        style="color:#D93F48;">*</span></label>
+                <input type="text" class="form-control " id="symptoms" name="symptoms">
+                <span class="error-message" id="symptoms-error"></span>
+            </div>
     
             <div class="uploadOuter">
                 <span class="dragBox" >

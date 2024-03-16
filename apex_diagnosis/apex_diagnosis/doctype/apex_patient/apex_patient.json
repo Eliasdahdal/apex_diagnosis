@@ -11,9 +11,11 @@
   "last_name",
   "latitude",
   "longitude",
+  "patient_symptoms",
+  "pathological_diagnosis",
+  "governorate_name",
   "normal_percentage",
   "pneumonia_percentage",
-  "governorate_name",
   "chest_image",
   "chest_cover",
   "result"
@@ -75,11 +77,21 @@
    "fieldname": "pneumonia_percentage",
    "fieldtype": "Data",
    "label": "pneumonia percentage"
+  },
+  {
+   "fieldname": "pathological_diagnosis",
+   "fieldtype": "Text",
+   "label": "pathological diagnosis"
+  },
+  {
+   "fieldname": "patient_symptoms",
+   "fieldtype": "Data",
+   "label": "patient's symptoms"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-02-16 10:23:30.020714",
+ "modified": "2024-03-15 18:42:33.832353",
  "modified_by": "Administrator",
  "module": "Apex Diagnosis",
  "name": "apex patient",

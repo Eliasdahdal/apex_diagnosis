@@ -7,6 +7,8 @@ import tensorflow as tf
 from keras.models import load_model
 from keras.models import model_from_json
 from PIL import Image
+import requests
+import json
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 model_json_name = "/model1.json"
@@ -72,17 +74,47 @@ def sanitize_filename(filename):
     # For simplicity, this example replaces spaces with underscores
     return filename.replace(' ', '_')
 
+
+def sent_to_llm(message):
+    url = 'https://www.chatbase.co/api/v1/chat'
+    headers = {
+        'Authorization': 'Bearer c709d9c5-706f-42e3-951f-a0fcd53e2c32',
+        'Content-Type': 'application/json'
+    }
+    data = {
+        "messages": [
+            {"content": "How can I help you?", "role": "assistant"},
+            {"content": message, "role": "user"}
+        ],
+        "chatbotId": "UV_rVP0e9dhD-U-wqHoQT",
+        "stream": False,
+        "temperature": 0.4
+    }
+    
+    try:
+        response = requests.post(url, headers=headers, data=json.dumps(data))
+        response.raise_for_status() 
+        json_data = response.json()
+        return json_data
+    except requests.exceptions.RequestException as e:
+        print("Error:", e)
+        return None
+
+
 @frappe.whitelist(allow_guest=True)
 def index():
     messages = []
     class_percentages_list = []
     image_paths = []
+    diagnosis_list =[]
     first_name = frappe.request.form.get("first_name")
     last_name = frappe.request.form.get("last_name")
+    symptoms =  frappe.request.form.get("symptoms")
     governorate = frappe.request.form.get("governorate")
     latitude  = frappe.request.form.get("latitude")
     longitude = frappe.request.form.get("longitude")
     files = frappe.request.files.getlist("files[]")
+
 
 
     for file in files:
@@ -111,27 +143,38 @@ def index():
         class_probabilities = loaded_model.predict(img)
         class_percentages = {class_names[i]: round(100 * class_probabilities[0][i], 2) for i in range(len(class_names))}
         class_percentages_list.append(class_percentages)
+    
+        
+        # symptoms_with_images = "after upload my chest x-ray image the result is normal percentage = " + str(class_percentages["NORMAL"]) + " and pneumonia percentage = " + str(class_percentages["PNEUMONIA"]) + " and my is " + symptoms
+        # diagnosis = sent_to_llm(symptoms_with_images)
+        # diagnosis_list.append(diagnosis['text'])
+        diagnosis_list.append("Lorem ipsum dolor sit amet consectetur adipisicing elit. In consequatur autem eum maxime laborum voluptate deserunt enim veniam, ea, vitae ab at nam facere rerum eligendi sint voluptatem iste? Quia?")
+
+        
 
         messages.append({
             "message": f"Uploaded file: {filename}",
             "class_percentage": class_percentages,
-            "image_path": file_path
+            "image_path": file_path,
+            "diagnosis": "Lorem ipsum dolor sit amet consectetur adipisicing elit. In consequatur autem eum maxime laborum voluptate deserunt enim veniam, ea, vitae ab at nam facere rerum eligendi sint voluptatem iste? Quia?",
         })
         
     todos = []
+    
+
 
     for message in messages:
         normal_percentage = message['class_percentage']['NORMAL']  
         pneumonia_percentage = message['class_percentage']['PNEUMONIA']
-        
         # Adjusting the image path
         image_path = message['image_path'].replace('/home/elias/Apex-Diagnosis/apps/apex_diagnosis/apex_diagnosis/public/', '/assets/apex_diagnosis/')
-
         # Storing relevant information in a dictionary
         todo_info = {
             "first_name": first_name,
             "last_name": last_name,
             "governorate_name": governorate,
+            "patient_symptoms": symptoms,
+            "pathological_diagnosis":message['diagnosis'],
             "latitude": latitude,
             "longitude": longitude,
             "normal_percentage": normal_percentage,
