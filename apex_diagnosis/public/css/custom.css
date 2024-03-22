@@ -485,7 +485,7 @@
     height: 100%;
     background-color: #111111;
     color: rgba(255, 255, 255, 0.3);
-    padding: 21rem 0 9rem;
+    padding: 21rem 53px 9rem;
     overflow-y: auto;
     overflow-x: hidden;
     visibility: hidden;
@@ -517,7 +517,7 @@
     position: relative;
   }
   
-  .s-info h1::before {
+  /* .s-info h1::before {
     display: block;
     content: "";
     width: 80px;
@@ -526,7 +526,7 @@
     position: absolute;
     left: 3px;
     top: -3.6rem;
-  }
+  } */
   
   .s-info h3 {
     font-family: "metropolis-regular", sans-serif;
@@ -1211,4 +1211,36 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.doctor-tools {
+  background-color: #000000;
+  padding-top: 30px;
+}
+
+#image-segmentation-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 20px;
+}
+.doctor-tools .main-form-area .uploadOuter {
+  width: 100%;
+}
+
+#isegmentation_submit {
+  width: 30%;
+}
+
+.doctor-tools #preview {
+  justify-content: center;
+}
+
+.doctor-tools .main-form-area #preview img {
+  width: 300px;
+}
+
+.leaflet-top, .leaflet-bottom {
+  z-index: 400 !important;
 }

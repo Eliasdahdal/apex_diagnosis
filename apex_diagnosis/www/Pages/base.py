@@ -9,16 +9,106 @@ from keras.models import model_from_json
 from PIL import Image
 import requests
 import json
+import skimage
+import torch
+import torchvision
+import torchxrayvision as xrv
+import io
+import base64
+import matplotlib.pyplot as plt
+
+
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 model_json_name = "/model1.json"
 model_h5_name = "/model1.h5"
 
+
 model_json_path = current_dir + model_json_name
 model_h5_path = current_dir + model_h5_name
 
-# print(os.path.abspath(os.path.join(current_dir, '..')) + "5555555555555555555555555555555555555555555555555555")
+@frappe.whitelist(allow_guest=True)
+# Assuming segmentation_model_path contains the path to your model file
+def load_segmentation_model():
+    # Load the model
+    model = xrv.baseline_models.chestx_det.PSPNet()
+    # Ensure the model is in evaluation mode
+    model.eval()
+    return model
 
+
+@frappe.whitelist(allow_guest=True)
+def image_segmentation(img_path, name):
+    img = skimage.io.imread(img_path)
+    img = xrv.datasets.normalize(img, 255)  # convert 8-bit image to [-1024, 1024] range
+    segmentation_model = load_segmentation_model()
+    # Assuming img has 3 color channels (RGB)
+    if len(img.shape) == 3:
+        img = img.mean(2)[None, ...]  # Convert to single color channel
+    else:
+        # Handle grayscale images or other cases
+        img = img[None, ...]
+
+    transform = torchvision.transforms.Compose([xrv.datasets.XRayCenterCrop(), xrv.datasets.XRayResizer(512)])
+    img = transform(img)
+    img = torch.from_numpy(img)
+    with torch.no_grad():
+        pred = segmentation_model(img)
+
+    # Define the path where you want to save the image
+    plt.figure(figsize=(26, 5))
+    plt.subplot(1, len(segmentation_model.targets) + 1, 1)
+    plt.imshow(img[0], cmap='gray')
+    for i in range(len(segmentation_model.targets)):
+        plt.subplot(1, len(segmentation_model.targets) + 1, i + 2)
+        plt.imshow(pred[0, i])
+        plt.title(segmentation_model.targets[i])
+        plt.axis('off')
+    plt.tight_layout()
+    
+    # Define the directory where you want to save the image
+    save_dir = "/home/elias/Apex-Diagnosis/apps/apex_diagnosis/apex_diagnosis/public/img"
+    # Concatenate the name with the file extension
+    save_path = os.path.join(save_dir, name)
+
+    # Save the figure as a PNG file with the specified name
+    plt.savefig(save_path)
+    # Close the plot to free up memory
+    plt.close()
+
+@frappe.whitelist(allow_guest=True)
+def image_segmentation_index():
+    messages = []
+    image_paths = []
+    files = frappe.request.files.getlist("segma_files[]")
+    
+    for file in files:
+        if file.filename == "":
+            messages.append({"message": "No selected file"})
+            continue
+
+        if not file.filename.lower().endswith((".jpg", ".jpeg", ".png")):
+            messages.append({"message": "File type not allowed"})
+            continue
+
+        filename = sanitize_filename(file.filename)
+        file_path = os.path.join("/home/elias/Apex-Diagnosis/apps/apex_diagnosis/apex_diagnosis/public/img", filename.replace('\\', '/'))
+        file_path = file_path.replace('\\', '/')
+
+        print(f"Sanitized Filename: {filename}")
+        print(f"File Path: {file_path}")
+
+        file.save(file_path)
+        image_paths.append(file_path)
+        
+        segmentation_result=image_segmentation(file_path,file.filename)
+        
+        messages.append({
+            "message": f"{filename}",
+            "image_path": file_path,
+        })
+        
+    return messages
 
 @frappe.whitelist(allow_guest=True)
 # Load the model and preprocessing functions
@@ -150,7 +240,8 @@ def index():
         # diagnosis_list.append(diagnosis['text'])
         diagnosis_list.append("Lorem ipsum dolor sit amet consectetur adipisicing elit. In consequatur autem eum maxime laborum voluptate deserunt enim veniam, ea, vitae ab at nam facere rerum eligendi sint voluptatem iste? Quia?")
 
-        
+
+
 
         messages.append({
             "message": f"Uploaded file: {filename}",

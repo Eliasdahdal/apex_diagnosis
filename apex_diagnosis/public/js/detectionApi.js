@@ -25,8 +25,9 @@ var predict_image = function (formData, csrf) {
         });
     });
 }
+
+
 var detectionResultDiv = document.querySelector('.detection-result');
-console.log(detectionResultDiv)
 
 // Function to create and append elements to the body
 function createImageElement(message, parentElement) {
@@ -79,106 +80,93 @@ function createImageElement(message, parentElement) {
 }
 
 
-
-
-
-    //for validation
-    // Get the form and its input fields
-    var form = document.querySelector('.main-form');
-    var inputs = form.querySelectorAll('input[type=text]');
-
-    // Reset the form and clear the input fields
-    function resetForm() {
-    form.reset();
-    inputs.forEach(function(input) {
-        input.value = '';
-    });
+//for validation
+// Get the form and its input fields
+var form = document.querySelector('.main-form');
+var inputs = form.querySelectorAll('input[type=text]');
+// Reset the form and clear the input fields
+function resetForm() {
+form.reset();
+inputs.forEach(function(input) {
+    input.value = '';
+});
+}
+// Function to validate the form
+function validateForm() {
+    var first_name = document.getElementById("first_name").value;
+    var last_name = document.getElementById("last_name").value;
+    var symptoms = document.getElementById("symptoms").value;
+    var governorate = document.querySelector('select[name="governorate"]').value;
+    var files = document.getElementById('uploadFile').files;
+    var isValid = true;
+    // Check first name is not empty
+    if (first_name === "") {
+        document.getElementById("first_name-error").innerHTML = "Please enter your first name";
+        isValid = false;
+    } else {
+        document.getElementById("first_name-error").innerHTML = "";
     }
-
-    // Function to validate the form
-    function validateForm() {
-
-        var first_name = document.getElementById("first_name").value;
-        var last_name = document.getElementById("last_name").value;
-        var symptoms = document.getElementById("symptoms").value;
-        var governorate = document.querySelector('select[name="governorate"]').value;
-        var files = document.getElementById('uploadFile').files;
-        var isValid = true;
-
-        // Check first name is not empty
-        if (first_name === "") {
-            document.getElementById("first_name-error").innerHTML = "Please enter your first name";
-            isValid = false;
-        } else {
-            document.getElementById("first_name-error").innerHTML = "";
-        }
-
-        // Check last name is not empty
-        if (last_name === "") {
-            document.getElementById("last_name-error").innerHTML = "Please enter your last name";
-            isValid = false;
-        } else {
-            document.getElementById("last_name-error").innerHTML = "";
-        }
-
-        if (symptoms === "") {
-            document.getElementById("symptoms-error").innerHTML = "Please enter your symptoms";
-            isValid = false;
-        } else {
-            document.getElementById("symptoms-error").innerHTML = "";
-        }
-
-        // Check governorate name is not empty
-        if (governorate === "Choose your governorate") {
-            document.getElementById("governorate-error").innerHTML = "Please choose your governorate ";
-            isValid = false;
-        }else {
-            document.getElementById("governorate-error").innerHTML = "";
-        }
-
-        // Validate file upload
-        if (files.length === 0) {
-            document.getElementById("image-upload-error").innerHTML = "Please select at least one file";
-            isValid = false;
-        }else {
-            document.getElementById("image-upload-error").innerHTML = "";
-        }
-
-        return isValid;
+    // Check last name is not empty
+    if (last_name === "") {
+        document.getElementById("last_name-error").innerHTML = "Please enter your last name";
+        isValid = false;
+    } else {
+        document.getElementById("last_name-error").innerHTML = "";
     }
+    if (symptoms === "") {
+        document.getElementById("symptoms-error").innerHTML = "Please enter your symptoms";
+        isValid = false;
+    } else {
+        document.getElementById("symptoms-error").innerHTML = "";
+    }
+    // Check governorate name is not empty
+    if (governorate === "Choose your governorate") {
+        document.getElementById("governorate-error").innerHTML = "Please choose your governorate ";
+        isValid = false;
+    }else {
+        document.getElementById("governorate-error").innerHTML = "";
+    }
+    // Validate file upload
+    if (files.length === 0) {
+        document.getElementById("image-upload-error").innerHTML = "Please select at least one file";
+        isValid = false;
+    }else {
+        document.getElementById("image-upload-error").innerHTML = "";
+    }
+    return isValid;
+}
+document.getElementById("submit").addEventListener("click", function (event) {
+    event.preventDefault();
+    if (validateForm()) {
+        var formData = new FormData(document.getElementById("image-upload-form"));
+        
+        // Show loading overlay
+        document.querySelector('.loading-overlay').style.display = 'block';
 
-    document.getElementById("submit").addEventListener("click", function (event) {
-        event.preventDefault();
-        if (validateForm()) {
-            var formData = new FormData(document.getElementById("image-upload-form"));
-            
-            // Show loading overlay
-            document.querySelector('.loading-overlay').style.display = 'block';
-    
-            predict_image(formData, csrf_token)
-                .then(function (result) {
-                    if (result.success) {
-                        console.log(result)
-                        var detectionResult = result.response.message;
-                        detectionResult.forEach(function(message) {
-                            createImageElement(message, detectionResultDiv);
-                        });
-                    } else {
-                        // Show error message
-                        alert(result.message);
-                    }
-                })
-                .catch(function (error) {
+        predict_image(formData, csrf_token)
+            .then(function (result) {
+                if (result.success) {
+                    console.log(result)
+                    var detectionResult = result.response.message;
+                    detectionResult.forEach(function(message) {
+                        createImageElement(message, detectionResultDiv);
+                    });
+                } else {
                     // Show error message
-                    alert(error.message);
-                })
-                .finally(function () {
-                    // Hide loading overlay regardless of success or failure
-                    document.querySelector('.loading-overlay').style.display = 'none';
-                });
-        }
-    });
-    
+                    alert(result.message);
+                }
+            })
+            .catch(function (error) {
+                // Show error message
+                alert(error.message);
+            })
+            .finally(function () {
+                // Hide loading overlay regardless of success or failure
+                document.querySelector('.loading-overlay').style.display = 'none';
+            });
+    }
+});
+
 
 
 // Drop and Drag Area
