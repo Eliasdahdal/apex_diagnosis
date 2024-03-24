@@ -631,6 +631,7 @@
     gap: 30px;
     flex-wrap: wrap;
     padding-top: 50px;
+    justify-self: center;
   }
 
 
@@ -1243,4 +1244,41 @@
 
 .leaflet-top, .leaflet-bottom {
   z-index: 400 !important;
+}
+
+.class-percentages {
+  display: flex;
+  width: 100%;
+  height: 20px;
+  margin-bottom: 5px;
+  justify-content: center;
+}
+.percentage-bar {
+  height: 100%;
+}
+.normal-bar {
+  background-color: green;
+}
+.pneumonia-bar {
+  background-color: red;
+}
+
+
+.almarai-regular {
+  font-family: "Almarai", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  direction: rtl;
+  text-align: justify;
+}
+@media (max-width:1100px) {
+  .main-form-area .form-header-title{
+    font-size: 30px;
+    width: 100%;
+  }
+  .main-form-container {
+    width: 100%;
+  }
+  }
+
 }

@@ -173,7 +173,7 @@ def sent_to_llm(message):
     }
     data = {
         "messages": [
-            {"content": "How can I help you?", "role": "assistant"},
+            {"content": "كيف يمكنني مساعدتك?", "role": "assistant"},
             {"content": message, "role": "user"}
         ],
         "chatbotId": "UV_rVP0e9dhD-U-wqHoQT",
@@ -238,8 +238,11 @@ def index():
         # symptoms_with_images = "after upload my chest x-ray image the result is normal percentage = " + str(class_percentages["NORMAL"]) + " and pneumonia percentage = " + str(class_percentages["PNEUMONIA"]) + " and my is " + symptoms
         # diagnosis = sent_to_llm(symptoms_with_images)
         # diagnosis_list.append(diagnosis['text'])
-        diagnosis_list.append("Lorem ipsum dolor sit amet consectetur adipisicing elit. In consequatur autem eum maxime laborum voluptate deserunt enim veniam, ea, vitae ab at nam facere rerum eligendi sint voluptatem iste? Quia?")
+        # diagnosis_list.append("Lorem ipsum dolor sit amet consectetur adipisicing elit. In consequatur autem eum maxime laborum voluptate deserunt enim veniam, ea, vitae ab at nam facere rerum eligendi sint voluptatem iste? Quia?")
 
+        symptoms_with_images = "بعد أن قمت برفع الصورة الشعاعية الصدرية كانت النتيجة الطبيعة بنسبة مئوية   = " + str(class_percentages["NORMAL"]) + " وبنسبة مئوية اني مصاب  = " + str(class_percentages["PNEUMONIA"]) + " وأعراضي هي " + symptoms + "قم بنصيحتي ماهي اختصاصات الأطباء الذي يجب أن اقوم بزيارتهم لكي ينصحوني بالعلاج بلاضافة للادوية و التحاليلة التي تتوقعها "
+        diagnosis = sent_to_llm(symptoms_with_images)
+        diagnosis_list.append(diagnosis['text'])
 
 
 
@@ -247,7 +250,7 @@ def index():
             "message": f"Uploaded file: {filename}",
             "class_percentage": class_percentages,
             "image_path": file_path,
-            "diagnosis": "Lorem ipsum dolor sit amet consectetur adipisicing elit. In consequatur autem eum maxime laborum voluptate deserunt enim veniam, ea, vitae ab at nam facere rerum eligendi sint voluptatem iste? Quia?",
+            "diagnosis": diagnosis['text'],
         })
         
     todos = []
