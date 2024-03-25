@@ -67,7 +67,7 @@ def image_segmentation(img_path, name):
     plt.tight_layout()
     
     # Define the directory where you want to save the image
-    save_dir = "/home/elias/Apex-Diagnosis/apps/apex_diagnosis/apex_diagnosis/public/img"
+    save_dir = "https://apex-diagnosis.frappe.cloud/assets/apex_diagnosis/img"
     # Concatenate the name with the file extension
     save_path = os.path.join(save_dir, name)
 
@@ -92,7 +92,7 @@ def image_segmentation_index():
             continue
 
         filename = sanitize_filename(file.filename)
-        file_path = os.path.join("/home/elias/Apex-Diagnosis/apps/apex_diagnosis/apex_diagnosis/public/img", filename.replace('\\', '/'))
+        file_path = os.path.join("https://apex-diagnosis.frappe.cloud/assets/apex_diagnosis/img", filename.replace('\\', '/'))
         file_path = file_path.replace('\\', '/')
 
         print(f"Sanitized Filename: {filename}")
@@ -217,7 +217,7 @@ def index():
             continue
 
         filename = sanitize_filename(file.filename)
-        file_path = os.path.join("/home/elias/Apex-Diagnosis/apps/apex_diagnosis/apex_diagnosis/public/img", filename.replace('\\', '/'))
+        file_path = os.path.join("https://apex-diagnosis.frappe.cloud/assets/apex_diagnosis/img", filename.replace('\\', '/'))
         file_path = file_path.replace('\\', '/')
 
         print(f"Sanitized Filename: {filename}")
@@ -261,7 +261,7 @@ def index():
         normal_percentage = message['class_percentage']['NORMAL']  
         pneumonia_percentage = message['class_percentage']['PNEUMONIA']
         # Adjusting the image path
-        image_path = message['image_path'].replace('/home/elias/Apex-Diagnosis/apps/apex_diagnosis/apex_diagnosis/public/', '/assets/apex_diagnosis/')
+        image_path = message['image_path'].replace('https://apex-diagnosis.frappe.cloud/assets/apex_diagnosis/public/', '/assets/apex_diagnosis/')
         # Storing relevant information in a dictionary
         todo_info = {
             "first_name": first_name,
